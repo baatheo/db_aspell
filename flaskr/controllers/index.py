@@ -1,13 +1,14 @@
 from flask import Blueprint
-from flaskr.models.word import Word
+from flaskr.models.word import Word, createWord
+from flaskr.models.file import File
 
 bp = Blueprint('index', __name__)
 
 
 @bp.route('/')
 def index():
-    w = Word()
-    return "Hello world!"
+    w = createWord("tree")
+    return "Hello world!" + str(w)
 
 
 @bp.route('/<string:name>')
