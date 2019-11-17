@@ -106,3 +106,4 @@ venv.bak/
 .idea
 package-lock.json
 node_modules/
+flaskr/db_aspell.db
