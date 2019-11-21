@@ -107,3 +107,4 @@ venv.bak/
 package-lock.json
 node_modules/
 flaskr/db_aspell.db
+flaskr/file.txt
