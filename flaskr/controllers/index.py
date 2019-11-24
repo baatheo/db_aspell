@@ -11,7 +11,7 @@ bp = Blueprint('index', __name__)
 def index():
     f = createFile("first")
     w = createWord("tree", f.id, 20)
-    readFileAndCreateDB()
+    readFileAndCreateDB("flaskr/file.txt")
     return render_template('base.html', action="/upload", w=w.word)
 
 @bp.route('/upload', methods=['POST'])

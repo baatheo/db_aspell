@@ -3,12 +3,11 @@ from flaskr.models.word import Word, createWord
 from flaskr.models.file import File, createFile
 
 
-def readFileAndCreateDB():
+def readFileAndCreateDB(file_name):
     # plik musi być pobrany od użytkownika i zapisany
     # nazwa pliku musi byc zapisana do zmiennej fileName bo pozniej
     # jest uzywana do utworzenia wpisu w bazie danych
 
-    file_name = "flaskr/file.txt"
     file = open(file_name, "r")
     result = file.read()
     regex = re.sub(r'[^a-zA-Z0-9 ]', r'', result)
