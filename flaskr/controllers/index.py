@@ -8,8 +8,6 @@ bp = Blueprint('index', __name__)
 
 @bp.route('/')
 def index():
-    f = createFile("first")
-    w = createWord("tree", f.id, 20)
     return render_template('base.html', action="/upload", w=w.word)
 
 
