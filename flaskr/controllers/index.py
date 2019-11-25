@@ -1,8 +1,7 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request
 from flaskr.models.word import Word, createWord
 from flaskr.models.file import File, createFile
 from flaskr.services.read_file import readFileAndCreateDB
-import io
 
 bp = Blueprint('index', __name__)
 
@@ -17,19 +16,19 @@ def index():
 @bp.route('/upload', methods=['POST'])
 def upload():
     file = request.files['file']
-    typ = file.headers['content-type']
-    zawartosc = str(file.read())
-    zawartosc = zawartosc[2:-1]
+    type = file.headers['content-type']
+    content = str(file.read())
+    content = content[2:-1]
 
-    if typ == "text/plain":
-        if len(zawartosc) == 0:
+    if type == "text/plain":
+        if len(content) == 0:
             return render_template('base.html', action="/upload", w="pusty plik sprobuj ponownie")
         else:
-            plik = open('flaskr/file.txt', 'w+')
-            plik.write(zawartosc)
-            plik.close()
+            fileToWrite = open('flaskr/file.txt', 'w+')
+            fileToWrite.write(content)
+            fileToWrite.close()
             readFileAndCreateDB("flaskr/file.txt")
-            return zawartosc
+            return content
     else:
         return render_template('base.html', action="/upload", w="zły format pliku sprobuj ponownie")
 
