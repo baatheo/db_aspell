@@ -16,11 +16,11 @@ def index():
 @bp.route('/upload', methods=['POST'])
 def upload():
     file = request.files['file']
-    type = file.headers['content-type']
+    typeOfFile = file.headers['content-type']
     content = str(file.read())
     content = content[2:-1]
 
-    if type == "text/plain":
+    if typeOfFile == "text/plain":
         if len(content) == 0:
             return render_template('base.html', action="/upload", w="pusty plik sprobuj ponownie")
         else:
