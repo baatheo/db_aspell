@@ -1,6 +1,4 @@
 from flask import Blueprint, render_template, request
-from flaskr.models.word import Word, createWord
-from flaskr.models.file import File, createFile
 from flaskr.services.read_file import readFileAndCreateDB
 
 bp = Blueprint('index', __name__)
@@ -8,7 +6,7 @@ bp = Blueprint('index', __name__)
 
 @bp.route('/')
 def index():
-    return render_template('base.html', action="/upload", w=w.word)
+    return render_template('base.html', action="/upload", w="")
 
 
 @bp.route('/upload', methods=['POST'])

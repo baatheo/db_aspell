@@ -1,13 +1,10 @@
 import re
+import os
 from flaskr.models.word import Word, createWord
 from flaskr.models.file import File, createFile
 
 
 def readFileAndCreateDB(file_name):
-    # plik musi być pobrany od użytkownika i zapisany
-    # nazwa pliku musi byc zapisana do zmiennej fileName bo pozniej
-    # jest uzywana do utworzenia wpisu w bazie danych
-
     file = open(file_name, "r")
     result = file.read()
     regex = re.sub(r'[^a-zA-Z0-9 ]', r'', result)
@@ -23,7 +20,7 @@ def readFileAndCreateDB(file_name):
         createWord(x, f.id, word_count.__getitem__(x))
 
     file.close()
-    # usunięcie pliku
+    os.remove(file_name)
 
     # TODO: napisać funkcję która przy dodawaniu nowych słów
     #  sprawdza czy takowe już się nie znajdują w bazie
