@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 from flaskr.services.read_file import readFileAndCreateDB
+from flaskr.services.spell_check import checkWord
 
 bp = Blueprint('index', __name__)
 
@@ -27,6 +28,24 @@ def upload():
             return content
     else:
         return render_template('base.html', action="/upload", w="zły format pliku sprobuj ponownie")
+
+
+@bp.route('/verify', methods=['POST', 'GET'])
+def verify():
+    if (not request.data):
+        error = "Empty payload"
+        return jsonify(error=error)
+
+    wordJson = request.json
+    wordList = []
+    for i in wordJson:
+        word = i['word']
+        tempJson = {
+            'word': word,
+            'reply': checkWord(word)
+        }
+        wordList.append(tempJson)
+    return jsonify(results=wordList, length=len(wordList))
 
 
 @bp.route('/<string:name>')
