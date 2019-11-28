@@ -10,4 +10,3 @@ def checkWord(word):
         output = p1.stdout.split(":")
         returnedWords =output[1].split(',')
         return returnedWords
-print(checkWord('hells'))
