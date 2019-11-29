@@ -1,12 +1,13 @@
 import subprocess
 
-#funkcja przyjmuje jako argument String i zwraca tablice propozycji poprawy tego słowa
-#jezeli slowo nalezy do slownika zwraca True
+
+# funkcja przyjmuje jako argument String i zwraca tablice propozycji poprawy tego słowa
+# jeżeli słowo należy do słownika zwraca True
 def checkWord(word):
-    p1 = subprocess.run(['aspell', '-a'], capture_output=True, text=True, input = word)
-    if(p1.stdout.find("*")!=-1):
+    aspell_process = subprocess.run(['aspell', '-a'], capture_output=True, text=True, input=word)
+    if aspell_process.stdout.find("*") != -1:
         return True
     else:
-        output = p1.stdout.split(":")
-        returnedWords =output[1].split(',')
-        return returnedWords
+        output = aspell_process.stdout.split(":")[1].split(', ')
+        output[0] = output[0].lstrip()
+        return output[:5]
