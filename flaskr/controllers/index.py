@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from flaskr.services.read_file import readFileAndCreateDB
+from flaskr.services.file_service import FileService
 
 bp = Blueprint('index', __name__)
 
@@ -20,10 +20,10 @@ def upload():
         if len(content) == 0:
             return render_template('base.html', action="/upload", w="pusty plik sprobuj ponownie")
         else:
-            fileToWrite = open('flaskr/file.txt', 'w+')
-            fileToWrite.write(content)
-            fileToWrite.close()
-            readFileAndCreateDB("flaskr/file.txt")
+            fs = FileService()
+            fs.setFileContent(content)
+            fs.setFileName(file.filename)
+            fs.saveFromContent()
             return content
     else:
         return render_template('base.html', action="/upload", w="zły format pliku sprobuj ponownie")

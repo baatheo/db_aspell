@@ -16,17 +16,24 @@ class Word(db.Model):
         return '<Word {}>'.format(self.word)
 
 
-def createWord(word, file, counter):
-    exists = db.session.query(db.exists().where(Word.word == word)).scalar()
-    print(exists)
-    if exists:
-        id = db.select(Word.id).filter(Word.word == word).one()
-        db.update(wordFile).where(wordFile.word_id == id).values(wordFile.counter + counter)
+def createOrUpdateWord(word, file):
+    word_exists = db.session.query(Word).filter_by(word=word).first()
+    if word_exists is not None:
+        word_id = word_exists.id
+        file_id = file.id
+        relation_exist = db.session.query(wordFile).filter_by(word_id=word_id, file_id=file_id).first()
+        if relation_exist is not None:
+            relation_exist.counter += 1
+            # db.session.query(wordFile).filter_by()
+            # db.session.commit()
+        else:
+            statement = wordFile.insert().values(word_id=word_id, file_id=file_id, counter=1)
+            db.session.execute(statement)
+            db.session.commit()
     else:
         w = Word(word=word, created=dt.now())
         db.session.add(w)
         db.session.commit()
-        statement = wordFile.insert().values(word_id=w.id, file_id=file, counter=counter)
+        statement = wordFile.insert().values(word_id=w.id, file_id=file.id, counter=1)
         db.session.execute(statement)
         db.session.commit()
-        return w
