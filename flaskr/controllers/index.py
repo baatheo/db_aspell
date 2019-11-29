@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, jsonify
-from flaskr.services.read_file import readFileAndCreateDB
 from flaskr.services.spell_check import checkWord
 from flaskr.services.file_service import FileService
 
