@@ -7,6 +7,10 @@ def checkWord(word):
     if(p1.stdout.find("*")!=-1):
         return True
     else:
-        output = p1.stdout.split(":")
+        p2 = p1.stdout.translate({ord(i): None for i in ' '})
+        output = p2.split(":")
         returnedWords =output[1].split(',')
+        print(returnedWords[:5])
         return returnedWords
+
+
