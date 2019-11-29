@@ -1,11 +1,11 @@
-import re
 import os
-from flaskr.models.word import Word, createOrUpdateWord
-from flaskr.models.file import File, createFile
+import re
+
+from flaskr.models.file import createFile
+from flaskr.models.word import createOrUpdateWord
 
 
 class FileService:
-
     file_name = None
     file_content = None
     word_list = []
@@ -36,7 +36,7 @@ class FileService:
         os.remove(self.file_name)
 
     def parseFileContent(self):
-        self.word_list = re.sub(r'[^a-zA-Z0-9 ]', r'', self.file_content).split()
+        self.word_list = re.sub(r'[^a-ząćęłńóśźżĄĆĘŁŃÓŚŹŻA-Z0-9 ]', r'', self.file_content).split()
 
     def createDB(self):
         file = createFile(self.file_name)

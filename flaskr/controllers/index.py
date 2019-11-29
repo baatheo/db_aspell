@@ -13,8 +13,9 @@ def index():
 def upload():
     file = request.files['file']
     typeOfFile = file.headers['content-type']
-    content = str(file.read())
-    content = content[2:-1]
+
+    # TODO @baatheo jak będzie inne kodowanie to się wyjebie. Zabezpiecz to jakiś try/catch
+    content = str(file.read().decode('utf-8'))
 
     if typeOfFile == "text/plain":
         if len(content) == 0:
