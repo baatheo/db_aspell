@@ -10,7 +10,6 @@ def checkWord(word):
         p2 = p1.stdout.translate({ord(i): None for i in ' '})
         output = p2.split(":")
         returnedWords =output[1].split(',')
-        print(returnedWords[:5])
-        return returnedWords
+        return returnedWords[:5]
 
 
