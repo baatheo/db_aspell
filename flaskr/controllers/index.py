@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
-from flaskr.services.read_file import readFileAndCreateDB
 from flaskr.services.spell_check import checkWord
+from flaskr.services.file_service import FileService
 
 bp = Blueprint('index', __name__)
 
@@ -14,17 +14,18 @@ def index():
 def upload():
     file = request.files['file']
     typeOfFile = file.headers['content-type']
-    content = str(file.read())
-    content = content[2:-1]
+
+    # TODO @baatheo jak będzie inne kodowanie to się wyjebie. Zabezpiecz to jakiś try/catch
+    content = str(file.read().decode('utf-8'))
 
     if typeOfFile == "text/plain":
         if len(content) == 0:
             return render_template('base.html', action="/upload", w="pusty plik sprobuj ponownie")
         else:
-            fileToWrite = open('flaskr/file.txt', 'w+')
-            fileToWrite.write(content)
-            fileToWrite.close()
-            readFileAndCreateDB("flaskr/file.txt")
+            fs = FileService()
+            fs.setFileContent(content)
+            fs.setFileName(file.filename)
+            fs.saveFromContent()
             return content
     else:
         return render_template('base.html', action="/upload", w="zły format pliku sprobuj ponownie")
