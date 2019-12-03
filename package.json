@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/baloo1379/db_aspell#readme",
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.11.2",
     "cross-env": "^6.0.3",
     "laravel-mix": "^5.0.0",
     "sass": "^1.23.0",

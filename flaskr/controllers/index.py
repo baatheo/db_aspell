@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from flaskr.services.spell_check import checkWord
-from flaskr.services.file_service import FileService
+from flaskr.services.file_to_db_service import FileToDBService
 
 bp = Blueprint('index', __name__)
 
@@ -22,7 +22,7 @@ def upload():
         if len(content) == 0:
             return render_template('base.html', action="/upload", w="pusty plik sprobuj ponownie")
         else:
-            fs = FileService()
+            fs = FileToDBService()
             fs.setFileContent(content)
             fs.setFileName(file.filename)
             fs.saveFromContent()

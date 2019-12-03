@@ -5,7 +5,7 @@ from flaskr.models.file import createFile
 from flaskr.models.word import createOrUpdateWord
 
 
-class FileService:
+class FileToDBService:
     file_name = None
     file_content = None
     word_list = []

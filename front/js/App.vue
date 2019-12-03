@@ -1,9 +1,9 @@
 <template>
   <div>
     <Navbar/>
-    <div class="section">
+    <main class="section">
       <router-view></router-view>
-    </div>
+    </main>
     <Footer/>
   </div>
 </template>
@@ -19,4 +19,7 @@
 </script>
 
 <style>
+  main.section {
+    min-height: calc(100vh - 220px);
+  }
 </style>

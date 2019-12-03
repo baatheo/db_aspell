@@ -23,8 +23,8 @@
     <div id="navbarBasicExample" class="navbar-menu" v-bind:class="{'is-active': isActive}">
       <div class="navbar-end">
         <router-link class="navbar-item" to="/" exact>Home</router-link>
+        <router-link class="navbar-item" to="/upload" exact>Upload dictionary</router-link>
       </div>
-      -
     </div>
   </nav>
 </template>
