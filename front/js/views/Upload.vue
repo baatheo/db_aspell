@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import Uploader from '../components/Widgets/Uploader';
+  import Uploader from '../components/Uploader';
 
     export default {
         name: "Upload",

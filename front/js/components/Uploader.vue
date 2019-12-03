@@ -34,14 +34,14 @@
                 isSending: false,
                 isReady: false,
                 errorText: false,
-                file: null
+                formData: new FormData()
             }
         },
         methods: {
             handleFile(event) {
                 this.errorText = false;
                 if (event.target.files[0]) {
-                    this.file = event.target.files[0];
+                    this.formData.append('file', event.target.files[0]);
                     this.isReady = true;
                 }
             },
@@ -49,11 +49,8 @@
                 if (this.isReady) {
                     this.errorText = false;
                     this.isSending = true;
-                    axios.post('/upload', this.file, {
-                        headers: {
-                            'Content-Type': 'text/plain'
-                        }
-                    })
+
+                    axios.post('/upload', this.formData)
                         .then((resp) => {
                             setTimeout(() => {
                             }, 1000);
