@@ -103,9 +103,16 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-.idea
+# user defined
 package-lock.json
-node_modules/
+*.txt
+mix-manifest.json
+.idea/
 flaskr/db_aspell.db
 flaskr/file.txt
-.txt
+flaskr/static/app.css
+flaskr/static/app.css.map
+flaskr/static/app.js
+flaskr/static/app.js.map
+flaskr/static/webfonts/
+node_modules/
