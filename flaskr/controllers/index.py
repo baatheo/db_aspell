@@ -15,8 +15,11 @@ def upload():
     file = request.files['file']
     typeOfFile = file.headers['content-type']
 
-    # TODO @baatheo jak będzie inne kodowanie to się wyjebie. Zabezpiecz to jakiś try/catch
-    content = str(file.read().decode('utf-8'))
+    try:
+        content = str(file.read().decode('utf-8'))
+    except NameError:
+        print("błędne kodowanie pliku")
+        return render_template('base.html', action="/upload", w="błędne kodowanie, sprobuj ponownie")
 
     if typeOfFile == "text/plain":
         if len(content) == 0:
