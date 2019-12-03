@@ -2,7 +2,7 @@ let mix = require('laravel-mix');
 
 mix
     .options({
-    processCssUrls: false,
+        processCssUrls: false,
     })
     .disableSuccessNotifications()
     .sourceMaps(false, 'source-map')
