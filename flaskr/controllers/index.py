@@ -39,8 +39,7 @@ def verify():
 
     wordJson = request.json
     wordList = []
-    for i in wordJson:
-        word = i['word']
+    for word in wordJson:
         tempJson = {
             'word': word,
             'reply': checkWord(word)
