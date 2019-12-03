@@ -15,8 +15,8 @@
           </span>
           </label>
         </div>
-        <p class="help is-danger" v-show="errorText">
-          {{ errorText }}
+        <p class="help" v-show="text" :class="textType">
+          {{ text }}
         </p>
       </div>
       <div class="control">
@@ -33,13 +33,14 @@
             return {
                 isSending: false,
                 isReady: false,
-                errorText: false,
+                textType: "",
+                text: false,
                 formData: new FormData()
             }
         },
         methods: {
             handleFile(event) {
-                this.errorText = false;
+                this.text = false;
                 if (event.target.files[0]) {
                     this.formData.append('file', event.target.files[0]);
                     this.isReady = true;
@@ -47,18 +48,19 @@
             },
             sendFile() {
                 if (this.isReady) {
-                    this.errorText = false;
+                    this.text = false;
                     this.isSending = true;
 
                     axios.post('/upload', this.formData)
                         .then((resp) => {
-                            setTimeout(() => {
-                            }, 1000);
                             console.log(resp);
+                            this.textType = "is-success";
+                            this.text = "File uploaded";
                         })
                         .catch((error) => {
                             console.error(error);
-                            this.errorText = "Something went wrong";
+                            this.textType = "is-danger";
+                            this.text = "Something went wrong";
                         })
                         .finally(() => {
                             this.isSending = false;
