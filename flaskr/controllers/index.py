@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify
 from flaskr.services.spell_check import checkWord
 from flaskr.services.file_to_db_service import FileToDBService
+from flaskr.services.dictionary_service import DictionaryService
 
 bp = Blueprint('index', __name__)
 
@@ -26,6 +27,7 @@ def upload():
             fs.setFileContent(content)
             fs.setFileName(file.filename)
             fs.saveFromContent()
+            DictionaryService.create_or_update_dictionary()
             return content
     else:
         return render_template('base.html', action="/upload", w="zły format pliku sprobuj ponownie")
