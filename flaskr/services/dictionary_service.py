@@ -25,28 +25,26 @@ class DictionaryService:
         for word in data:
             words_list.append(word[:-1])
 
+        file.close()
         return words_list
 
     @staticmethod
-    def write_txt(words_from_database, words_already_existing, path):
-        if os.path.isfile(path) is True:
-            file = open(path, 'r+')
-            w = words_already_existing + words_from_database
-            w.sort()
-            for word in w:
-                file.write(word)
-                file.write('\n')
-
+    def write_txt(words_from_database, path):
+        if os.path.isfile(path):
+            words_list = DictionaryService.get_existing_words(path) + words_from_database
         else:
-            file = open(path, 'w')
-            for word in words_from_database:
-                file.write(word)
-                file.write('\n')
+            words_list = words_from_database
+
+        words_list.sort()
+        file = open(path, 'w')
+
+        for word in words_list:
+            file.write(word)
+            file.write('\n')
+
         file.close()
 
     @staticmethod
     def create_or_update_dictionary():
         path = "flaskr/services/dict.txt"
-        DictionaryService.write_txt(
-            DictionaryService.get_words_from_db(),
-            DictionaryService.get_existing_words(path), path)
+        DictionaryService.write_txt(DictionaryService.get_words_from_db(), path)
