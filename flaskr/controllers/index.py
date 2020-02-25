@@ -19,13 +19,13 @@ def upload():
     if typeOfFile == "text/plain":
         try:
             content = str(file.read().decode('utf-8'))
-        except NameError:
+        except UnicodeDecodeError:
             errors.append("Cant decode content of file")
-            form = {'errors': errors}
+            form = {'errors': errors, 'success': False}
             return make_response(jsonify(form=form), 422)
         if len(content) == 0:
             errors.append("empty payload")
-            form = {'errors': errors}
+            form = {'errors': errors, 'success': False}
             return make_response(jsonify(form=form), 422)
         else:
             fs = FileToDBService()
@@ -33,11 +33,11 @@ def upload():
             fs.setFileName(file.filename)
             fs.saveFromContent()
             DictionaryService.create_or_update_dictionary()
-            form = {'success': "File uploaded successfully"}
+            form = {'message': "File uploaded successfully", 'success': True}
             return make_response(jsonify(form=form), 201)
     else:
         errors.append("Wrong file format")
-        form = {'errors': errors}
+        form = {'errors': errors, 'success': False}
         return make_response(jsonify(form=form), 422)
 
 
