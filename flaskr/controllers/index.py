@@ -26,7 +26,7 @@ def upload():
             fs = FileToDBService()
             fs.setFileContent(content)
             fs.setFileName(file.filename)
-            fs.saveFromContent()
+            fs.setWords()
             DictionaryService.create_or_update_dictionary()
             return content
     else:

@@ -16,7 +16,7 @@ class FileToDBService:
     def setFileContent(self, content):
         self.file_content = content
 
-    def saveFromContent(self):
+    def setWords(self):
         if self.file_content is not None:
             self.parseFileContent()
             self.createDB()
@@ -24,7 +24,7 @@ class FileToDBService:
     def saveFromFile(self):
         if self.file_name is not None:
             self.readFile()
-            self.saveFromContent()
+            self.setWords()
             self.removeFile()
 
     def readFile(self):
@@ -36,7 +36,7 @@ class FileToDBService:
         os.remove(self.file_name)
 
     def parseFileContent(self):
-        self.word_list = re.sub(r'[^a-ząćęłńóśźżĄĆĘŁŃÓŚŹŻA-Z0-9 ]', r'', self.file_content).split()
+        self.word_list = re.sub(r'[^a-ząćęłńóśźżĄĆĘŁŃÓŚŹŻA-Z0-9\n ]', r'', self.file_content).split()
 
     def createDB(self):
         file = createFile(self.file_name)
