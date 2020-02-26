@@ -111,3 +111,4 @@ mix-manifest.json
 flaskr/db_aspell.db
 flaskr/file.txt
 node_modules/
+flaskr/static/

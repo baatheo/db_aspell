@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, make_response
 from flaskr.services.spell_check import checkWord
 from flaskr.services.file_to_db_service import FileToDBService
 from flaskr.services.dictionary_service import DictionaryService
@@ -15,39 +15,52 @@ def index():
 def upload():
     file = request.files['file']
     typeOfFile = file.headers['content-type']
-
-    # TODO @baatheo jak będzie inne kodowanie to się wyjebie. Zabezpiecz to jakiś try/catch
-    content = str(file.read().decode('utf-8'))
-
+    errors = []
     if typeOfFile == "text/plain":
+        try:
+            content = str(file.read().decode('utf-8'))
+        except UnicodeDecodeError:
+            errors.append("Cant decode content of file")
+            form = {'errors': errors, 'success': False}
+            return make_response(jsonify(form=form), 422)
         if len(content) == 0:
-            return render_template('base.html', action="/upload", w="pusty plik sprobuj ponownie")
+            errors.append("empty payload")
+            form = {'errors': errors, 'success': False}
+            return make_response(jsonify(form=form), 422)
         else:
             fs = FileToDBService()
             fs.setFileContent(content)
             fs.setFileName(file.filename)
             fs.saveFromContent()
             DictionaryService.create_or_update_dictionary()
-            return content
+            form = {'message': "File uploaded successfully", 'success': True}
+            return make_response(jsonify(form=form), 201)
     else:
-        return render_template('base.html', action="/upload", w="zły format pliku sprobuj ponownie")
+        errors.append("Wrong file format")
+        form = {'errors': errors, 'success': False}
+        return make_response(jsonify(form=form), 422)
 
 
 @bp.route('/verify', methods=['POST', 'GET'])
 def verify():
-    if (not request.data):
-        error = "Empty payload"
-        return jsonify(error=error)
+    if not request.data:
+        errors = []
+        errors.append("empty payload")
+        form = {'errors': errors}
+        return make_response(jsonify(form=form), 422)
 
+    #TODO dopracować do końca pobieranie słów i przekazanie do przetwarzania
     wordJson = request.json
     wordList = []
-    for word in wordJson:
+    for i in wordJson:
+        word = i['word']
         tempJson = {
             'word': word,
-            'reply': checkWord(word)
+            'reply': "foo"
         }
         wordList.append(tempJson)
-    return jsonify(results=wordList, length=len(wordList))
+    form = {'success': "Returned words", 'results': wordList, 'length': len(wordList)}
+    return make_response(jsonify(form=form))
 
 
 @bp.route('/<string:name>')
