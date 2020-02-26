@@ -63,6 +63,11 @@ def verify():
     return make_response(jsonify(form=form))
 
 
+@bp.route('/verify2', methods=['POST'])
+def ver():
+    return make_response(jsonify(request.form))
+
+
 @bp.route('/<string:name>')
 def hello(name):
     return f"Hello, {name.capitalize()}"

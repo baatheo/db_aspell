@@ -1,5 +1,5 @@
 <template>
-    <form class="box" action="/upload" enctype="multipart/form-data" @submit.prevent="sendFile">
+    <form class="box" :action="action" enctype="multipart/form-data" @submit.prevent="sendFile">
         <div class="field">
             <div class="control">
                 <div class="file">
@@ -33,6 +33,7 @@
         name: "Uploader",
         data() {
             return {
+                action: '/upload',
                 isSending: false,
                 isReady: false,
                 helpText: false,
@@ -55,7 +56,7 @@
                     this.helpText = false;
                     this.isSending = true;
 
-                    axios.post('/upload', this.formData)
+                    axios.post(this.action, this.formData)
                         .then((resp) => {
                             if (resp.data.form.success) {
                                 this.helpTextType = "is-success";
