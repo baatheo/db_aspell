@@ -1,4 +1,5 @@
 import os
+import io
 
 from flaskr.services.signal_service import signalService
 from flaskr.models import db
@@ -20,7 +21,7 @@ class DictionaryService:
     @staticmethod
     def get_existing_words(path):
         words_list = []
-        file = open(path, 'r')
+        file = io.open(path, 'r', encoding='utf8')
         data = file.readlines()
 
         for word in data:
@@ -37,7 +38,7 @@ class DictionaryService:
             words_list = words_from_database
 
         words_list.sort()
-        file = open(path, 'w')
+        file = io.open(path, 'w', encoding='utf8')
 
         for word in words_list:
             file.write(word)
