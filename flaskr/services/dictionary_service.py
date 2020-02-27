@@ -1,5 +1,6 @@
 import os
-from flaskr.services.spell_check import createDictionaryFromDatabase
+
+from flaskr.services.signal_service import signalService
 from flaskr.models import db
 from flaskr.models.word import Word
 
@@ -43,8 +44,10 @@ class DictionaryService:
             file.write('\n')
 
         file.close()
+        file_written = signalService.get_signal('file_written')
+        file_written.send()
 
     @staticmethod
     def create_or_update_dictionary():
-        path = "flaskr/services/dict.txt"
-        DictionaryService.write_txt(DictionaryService.get_words_from_db(), path)
+        file_name = "dict.txt"
+        DictionaryService.write_txt(DictionaryService.get_words_from_db(), file_name)
