@@ -44,7 +44,7 @@ class SpellCheckService:
             try:
                 res = subprocess.check_output([aspell_process], shell=True)
             except subprocess.CalledProcessError as e:
-                pass
+                return False
 
             SpellCheckService.delete_file(temp_path)
             SpellCheckService.delete_file('dict.txt')
