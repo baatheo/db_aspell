@@ -1,10 +1,9 @@
 <template>
     <div>
-        <form class="box" :action="action" enctype="multipart/form-data" @submit.prevent="check">
+        <form class="box" :action="action" enctype="multipart/form-data" @submit.prevent="test">
             <div class="field">
                 <label for="textInput" class="label">A</label>
-                <textarea name="textInput" id="textInput" cols="30" rows="6" class="textarea">{{ test }}</textarea>
-
+                <textarea v-model="textInput" name="textInput" id="textInput" cols="30" rows="6" class="textarea"></textarea>
             </div>
             <div class="field">
                 <div class="control">
@@ -13,15 +12,18 @@
             </div>
         </form>
         <div v-show="isReady" class="box">
-            <div v-html="result"></div>
+            <div ref="result"></div>
         </div>
     </div>
-
 </template>
 
 <script>
+    import Button from "./Button";
+    const ButtonClass = Vue.extend(Button);
+
     export default {
         name: "SpellCheck",
+        components: {Button},
         data() {
             return {
                 action: '/verify2',
@@ -30,26 +32,64 @@
                 helpText: false,
                 helpTextType: "",
                 formData: new FormData(),
-                test: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                result: ''
+                textInput: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                tempText: [],
+                elements: []
             }
         },
+        mounted() {
+            this.copyText()
+        },
         methods: {
-            check: function(event) {
+            copyText: function () {
+                this.tempText = [(' ' + this.textInput).slice(1)];
+            },
+            test() {
+                this.copyText();
+                let list = {
+                    "ipsum": {
+                        "list": ["ipsugum", "ipsumem", "ippsum"],
+                        "pos": [0, 2],
+                    },
+                    "adipiscing": {
+                        "list": ["foo", "foo2"],
+                        "pos": [1, 3],
+                    }
+                };
+                let t = this.tempText;
+
+                for (let word in list) {
+                    let temp = [];
+                    let arr = [];
+                    t.forEach((token) => {
+                        if ("string" === typeof token) {
+                            temp = token.split(word);
+                            arr.push(...temp);
+                            //arr = [...arr].map((e, i) => i < arr.length - 1 ? [e,  new ButtonClass()] : [e]).reduce((a, b) => a.concat(b))
+                        }
+                    });
+                    t = arr;
+                    console.log(t);
+
+                    // [...arr].map((e, i) => i < arr.length - 1 ? [e,  new ButtonClass()] : [e]).reduce((a, b) => a.concat(b)).forEach((el) => {
+                    //     this.elements.push(el);
+                    // });
+
+                    // this.elements.push(document.createTextNode(xd[0]));
+                    // this.elements.push(new ButtonClass());
+                    // this.tempText = xd[1];
+                }
+
+            },
+            check: function (event) {
+                this.copyText();
                 this.isSending = true;
                 this.formData = new FormData(event.target);
                 axios.post(this.action, this.formData)
                     .then((resp) => {
                         console.log(resp);
-                        let list = {
-                            'ipsum' : ['ipsum', 'ipsumem', 'ippsum'],
-                            'adipiscing': ['foo', 'foo2']
-                        };
-                        this.result = (' ' + this.test).slice(1);
-                        // button need to be separated component
-                        list.forEach((el, i) => {
-                            this.result =  this.result.replace(el, `<button class="misspell has-text-danger">${el}</button>`);
-                        });
+
+
                         this.isReady = true;
                     })
                     .catch((error) => {
@@ -57,6 +97,7 @@
                     })
                     .finally(() => {
                         this.isSending = false;
+                        console.log(this.elements)
                     });
 
 
@@ -66,16 +107,5 @@
 </script>
 
 <style>
-    button.misspell {
-        text-decoration: underline !important;
-        background: none;
-        margin: 0;
-        padding: 0;
-        border: none;
-        font-size: 1em;
-    }
 
-    button.misspell:hover {
-        cursor: pointer;
-    }
 </style>
