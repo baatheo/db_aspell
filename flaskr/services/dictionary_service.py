@@ -1,5 +1,7 @@
 import os
+import io
 
+from flaskr.services.signal_service import signalService
 from flaskr.models import db
 from flaskr.models.word import Word
 
@@ -19,7 +21,7 @@ class DictionaryService:
     @staticmethod
     def get_existing_words(path):
         words_list = []
-        file = open(path, 'r')
+        file = io.open(path, 'r', encoding='utf8')
         data = file.readlines()
 
         for word in data:
@@ -36,15 +38,17 @@ class DictionaryService:
             words_list = words_from_database
 
         words_list.sort()
-        file = open(path, 'w')
+        file = io.open(path, 'w', encoding='utf8')
 
         for word in words_list:
             file.write(word)
             file.write('\n')
 
         file.close()
+        file_written = signalService.get_signal('file_written')
+        file_written.send()
 
     @staticmethod
     def create_or_update_dictionary():
-        path = "flaskr/services/dict.txt"
-        DictionaryService.write_txt(DictionaryService.get_words_from_db(), path)
+        file_name = "dict.txt"
+        DictionaryService.write_txt(DictionaryService.get_words_from_db(), file_name)
