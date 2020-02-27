@@ -1,5 +1,5 @@
 import os
-
+from flaskr.services.spell_check import createDictionaryFromDatabase
 from flaskr.models import db
 from flaskr.models.word import Word
 
