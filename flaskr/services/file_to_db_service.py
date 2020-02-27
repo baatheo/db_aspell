@@ -16,7 +16,7 @@ class FileToDBService:
     def setFileContent(self, content):
         self.file_content = content
 
-    def saveFromContent(self):
+    def setWords(self):
         if self.file_content is not None:
             self.parseFileContent()
             self.createDB()
@@ -24,7 +24,7 @@ class FileToDBService:
     def saveFromFile(self):
         if self.file_name is not None:
             self.readFile()
-            self.saveFromContent()
+            self.setWords()
             self.removeFile()
 
     def readFile(self):
