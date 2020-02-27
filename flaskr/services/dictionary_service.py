@@ -37,7 +37,7 @@ class DictionaryService:
             words_list = words_from_database
 
         words_list.sort()
-        file = io.open(path, 'w', encoding='uft8')
+        file = io.open(path, 'w', encoding='utf8')
 
         for word in words_list:
             file.write(word)
