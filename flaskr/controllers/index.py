@@ -65,18 +65,18 @@ def verify():
     input.setInputString(content)
     inputWords = input.getWordList()
     output_dict_list = []
-    # for word in inputWords:
-    #    if SpellCheckService.checkWord(word) is not True:
-    #        incorrect_words.append(word)
-    #
-    input.setInputWords(incorrect_words)
+    for word in inputWords:
+       if SpellCheckService.checkWord(word) is not True:
+           incorrect_words.append(word)
+
+    input.setInputString(incorrect_words)
     input.setOutputWords()
     output_word_list = input.getOutputWordList()
     for word in output_word_list:
         wordDict = {}
         wordDict[word["word"]] = {
-            "list": ["foo1", "foo2"],
-            "pos": word["pos"] #tutaj wywolanie checkWord
+            "list": SpellCheckService.checkWord(word["word"]),
+            "pos": word["pos"]
         }
         output_dict_list.append(wordDict)
     return make_response(jsonify(output_dict_list), 200)

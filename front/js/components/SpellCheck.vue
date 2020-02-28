@@ -34,7 +34,7 @@
         components: {Button},
         data() {
             return {
-                action: "/verify2",
+                action: "/verify",
                 isSending: false,
                 isReady: false,
                 helpText: false,
@@ -105,20 +105,7 @@
                 axios
                     .post(this.action, this.formData)
                     .then(resp => {
-                        const list = {
-                            "ipsum": {
-                                "list": ["ipsugum", "ipsumem", "ippsum"],
-                                "pos": [0, 3]
-                            },
-                            "adipiscing": {
-                                "list": ["foo", "foo2"],
-                                "pos": [1, 4]
-                            },
-                            "elit": {
-                                "list": ["bar", "bar2"],
-                                "pos": [2, 5]
-                            },
-                        };
+                        console.log(resp);
                         this.elements = this.findErrorsInInput(list);
                         return list;
                     })

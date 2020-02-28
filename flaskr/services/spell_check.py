@@ -23,7 +23,7 @@ class SpellCheckService:
 
     @staticmethod
     def checkWord(word):
-        process = f"echo {word} | aspell -a -d ./../../ourDictionary"
+        process = f"echo {word} | aspell -a -d ./ourDictionary"
         aspell_process = subprocess.Popen(process, shell=True, stdout=subprocess.PIPE)
         cmd_output = aspell_process.stdout.read().decode("utf-8")
         if cmd_output.find("*") != -1:
