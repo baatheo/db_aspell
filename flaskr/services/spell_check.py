@@ -1,8 +1,7 @@
 import subprocess
 import os
 from pathlib import Path
-from flaskr.services.signal_service import signalService
-
+import time
 
 class SpellCheckService:
 
@@ -27,11 +26,13 @@ class SpellCheckService:
         temp_path = os.getcwd()
         current_dir = '.' + str(Path(temp_path).parents[1]) + '/ourDictionary'
         os.chdir(str(Path(temp_path).parents[1]))
-        aspell_process = subprocess.run(['aspell', '-d', './ourDictionary', '-a'], capture_output=True, text=True, input=word)
-        if aspell_process.stdout.find("*") != -1:
+        process = f"echo {word} | aspell -a -d ./ourDictionary"
+        aspell_process = subprocess.Popen(process, shell=True ,stdout=subprocess.PIPE)
+        cmd_output = aspell_process.stdout.read().decode("utf-8")
+        if cmd_output.find("*") != -1:
             return True
         else:
-            output = aspell_process.stdout.split(":")[1].split(', ')
+            output = cmd_output.split(":")[1].split(', ')
             output[0] = output[0].lstrip()
             if len(output) < 5:
                 output[len(output)-1] = output[len(output)-1].replace('\n','')
@@ -55,7 +56,6 @@ class SpellCheckService:
                 SpellCheckService.delete_file('dict.txt')
             except subprocess.CalledProcessError as e:
                 return False
-                #logger
 
     @staticmethod
     def checkDictionaryIfExists():
