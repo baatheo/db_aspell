@@ -50,7 +50,7 @@ def upload():
 
 @bp.route('/verify', methods=['POST', 'GET'])
 def verify():
-    if not request.data:
+    if not request.form:
         errors = []
         errors.append("empty payload")
         form = {'errors': errors}

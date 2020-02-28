@@ -48,3 +48,7 @@ class SpellCheckService:
 
             SpellCheckService.delete_file(temp_path)
             SpellCheckService.delete_file('dict.txt')
+
+
+if __name__ == "__main__":
+    SpellCheckService.checkWord("stasi")
