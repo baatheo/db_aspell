@@ -1,10 +1,8 @@
 <template>
     <div ref="word" class="word" @close-toasts="close">
         <button class="misspell has-text-danger" v-text="text" @click="open"></button>
-        <div class="box toast" v-show="isOpen">
-            <button class="button is-small is-success" @click="choose">Foo</button>
-            <button class="button is-small is-success" @click="choose">Foo2</button>
-            <button class="button is-small is-success" @click="choose">Foo3</button>
+        <div ref="balloon" class="balloon box buttons has-addons" v-show="isOpen">
+            <button v-for="p in proms" :key="p" class="button" @click="choose">{{ p }}</button>
         </div>
     </div>
 </template>
@@ -14,22 +12,22 @@
 
     export default {
         name: "Button",
-        props: [ 'text' ],
+        props: [ 'text', 'proms' ],
         data() {
             return {
                 isOpen: false
             }
         },
         created() {
-            eventBus.$on('close-toasts', this.close);
+            eventBus.$on('close-balloon', this.close);
         },
         methods: {
-            open: function(){
-                eventBus.$emit('close-toasts');
+            open: function(event){
+                eventBus.$emit('close-balloon');
                 this.isOpen = true;
+                this.$refs["balloon"].style.left = (event.clientX-50) + 'px';
             },
             close: function () {
-                console.log('close');
                 this.isOpen = false;
             },
             choose: function(event) {
@@ -58,9 +56,11 @@
         cursor: pointer;
     }
 
-    div.box.toast {
+    div.box.balloon {
         position: absolute;
-
+    }
+    .balloon.buttons .button {
+        margin-bottom: 0;
     }
 
 </style>

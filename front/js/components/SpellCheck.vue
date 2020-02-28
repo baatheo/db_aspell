@@ -2,7 +2,7 @@
     <div>
         <form class="box" :action="action" enctype="multipart/form-data" @submit.prevent="check">
             <div class="field">
-                <label for="textInput" class="label">A</label>
+                <label for="textInput" class="label sr-only">A</label>
                 <textarea
                     v-model="textInput"
                     name="textInput"
@@ -21,13 +21,11 @@
         <div v-show="isReady" class="box">
             <div ref="result"></div>
         </div>
-        <Button text="TEST"/>
     </div>
 </template>
 
 <script>
     import Button from "./Button";
-    import eventBus from "../eventBus";
 
     const ButtonClass = Vue.extend(Button);
 
@@ -76,15 +74,15 @@
                 for (let m in misspells) {
                     if (misspells.hasOwnProperty(m)) {
                         let positions = misspells[m]["pos"];
+                        let list = misspells[m]["list"];
                         for (let pos in positions) {
-                            pp[positions[pos]] = new ButtonClass({propsData: { text: m }});
+                            pp[positions[pos]] = new ButtonClass({propsData: { text: m, proms: list }});
                         }
                     }
                 }
                 return pp;
             },
             concatTextAndErrors: function (text, components) {
-                console.log({text, components});
                 let x = [];
                 let c = Math.max(text.length, components.length);
                 for (let i = 0; i < c; i++) {
@@ -107,7 +105,6 @@
                 axios
                     .post(this.action, this.formData)
                     .then(resp => {
-                        console.log(resp);
                         const list = {
                             "ipsum": {
                                 "list": ["ipsugum", "ipsumem", "ippsum"],
