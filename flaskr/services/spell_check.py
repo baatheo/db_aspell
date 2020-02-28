@@ -23,11 +23,8 @@ class SpellCheckService:
 
     @staticmethod
     def checkWord(word):
-        temp_path = os.getcwd()
-        current_dir = '.' + str(Path(temp_path).parents[1]) + '/ourDictionary'
-        os.chdir(str(Path(temp_path).parents[1]))
-        process = f"echo {word} | aspell -a -d ./ourDictionary"
-        aspell_process = subprocess.Popen(process, shell=True ,stdout=subprocess.PIPE)
+        process = f"echo {word} | aspell -a -d ./../../ourDictionary"
+        aspell_process = subprocess.Popen(process, shell=True, stdout=subprocess.PIPE)
         cmd_output = aspell_process.stdout.read().decode("utf-8")
         if cmd_output.find("*") != -1:
             return True
@@ -35,7 +32,7 @@ class SpellCheckService:
             output = cmd_output.split(":")[1].split(', ')
             output[0] = output[0].lstrip()
             if len(output) < 5:
-                output[len(output)-1] = output[len(output)-1].replace('\n','')
+                output[len(output) - 1] = output[len(output) - 1].replace('\n', '')
                 return output[:len(output)]
             else:
                 return output[:5]
