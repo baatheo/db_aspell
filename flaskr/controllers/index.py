@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, make_response
 from flaskr.services.spell_check import SpellCheckService
 from flaskr.services.file_to_db_service import FileToDBService
 from flaskr.services.dictionary_service import DictionaryService
 from flaskr.services.signal_service import signalService
 from flask.signals import signals_available
+import os
 
 bp = Blueprint('index', __name__)
 
@@ -38,10 +39,16 @@ def upload():
             fs = FileToDBService()
             fs.setFileContent(content)
             fs.setFileName(file.filename)
-            fs.saveFromContent()
+            fs.setWords()
+            signalService.get_signal('file_written').connect(SpellCheckService.createDictionaryFromDatabase)
             DictionaryService.create_or_update_dictionary()
-            form = {'message': "File uploaded successfully", 'success': True}
-            return make_response(jsonify(form=form), 201)
+            if not os.path.isfile('ourDictionary'):
+                errors.append("Dictonary were not created")
+                form = {'errors': errors, 'success': False}
+                return make_response(jsonify(form=form), 422)
+            else:
+                form = {'message': "File uploaded successfully", 'success': True}
+                return make_response(jsonify(form=form), 201)
     else:
         errors.append("Wrong file format")
         form = {'errors': errors, 'success': False}
