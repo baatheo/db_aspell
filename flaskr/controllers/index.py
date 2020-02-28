@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, make_response
 from flaskr.services.spell_check import SpellCheckService
 from flaskr.services.file_to_db_service import FileToDBService
 from flaskr.services.dictionary_service import DictionaryService
 from flaskr.services.signal_service import signalService
 from flask.signals import signals_available
+from flaskr.services.input_service import InputService
 
 bp = Blueprint('index', __name__)
 
@@ -38,8 +39,9 @@ def upload():
             fs = FileToDBService()
             fs.setFileContent(content)
             fs.setFileName(file.filename)
-            fs.saveFromContent()
+            fs.setWords()
             DictionaryService.create_or_update_dictionary()
+            SpellCheckService.createDictionaryFromDatabase()
             form = {'message': "File uploaded successfully", 'success': True}
             return make_response(jsonify(form=form), 201)
     else:
@@ -50,24 +52,34 @@ def upload():
 
 @bp.route('/verify', methods=['POST', 'GET'])
 def verify():
-    if not request.data:
+    if not request.form:
         errors = []
         errors.append("empty payload")
         form = {'errors': errors}
         return make_response(jsonify(form=form), 422)
 
-    #TODO dopracować do końca pobieranie słów i przekazanie do przetwarzania
-    wordJson = request.json
-    wordList = []
-    for i in wordJson:
-        word = i['word']
-        tempJson = {
-            'word': word,
-            'reply': SpellCheckService.checkWord(word)
+    rawContent = request.form
+    content = rawContent.get('textInput')
+    incorrect_words = []
+    input = InputService()
+    input.setInputString(content)
+    inputWords = input.getWordList()
+    output_dict_list = []
+    # for word in inputWords:
+    #    if SpellCheckService.checkWord(word) is not True:
+    #        incorrect_words.append(word)
+    #
+    input.setInputWords(incorrect_words)
+    input.setOutputWords()
+    output_word_list = input.getOutputWordList()
+    for word in output_word_list:
+        wordDict = {}
+        wordDict[word["word"]] = {
+            "list": ["foo1", "foo2"],
+            "pos": word["pos"] #tutaj wywolanie checkWord
         }
-        wordList.append(tempJson)
-    form = {'success': "Returned words", 'results': wordList, 'length': len(wordList)}
-    return make_response(jsonify(form=form))
+        output_dict_list.append(wordDict)
+    return make_response(jsonify(output_dict_list), 200)
 
 
 @bp.route('/<string:name>')
