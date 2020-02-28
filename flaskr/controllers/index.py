@@ -42,13 +42,8 @@ def upload():
             fs.setWords()
             signalService.get_signal('file_written').connect(SpellCheckService.createDictionaryFromDatabase)
             DictionaryService.create_or_update_dictionary()
-            if not os.path.isfile('ourDictionary'):
-                errors.append("Dictonary were not created")
-                form = {'errors': errors, 'success': False}
-                return make_response(jsonify(form=form), 422)
-            else:
-                form = {'message': "File uploaded successfully", 'success': True}
-                return make_response(jsonify(form=form), 201)
+            form = {'message': "File uploaded successfully", 'success': True}
+            return make_response(jsonify(form=form), 201)
     else:
         errors.append("Wrong file format")
         form = {'errors': errors, 'success': False}
@@ -62,6 +57,11 @@ def verify():
         errors.append("empty payload")
         form = {'errors': errors}
         return make_response(jsonify(form=form), 422)
+    if not SpellCheckService.checkDictionaryIfExists():
+        errors = []
+        errors.append("Aspell dictionary don't exsist")
+        form = {'errors': errors}
+        return make_response(jsonify(form=form), 503)
 
     #TODO dopracować do końca pobieranie słów i przekazanie do przetwarzania
     wordJson = request.json

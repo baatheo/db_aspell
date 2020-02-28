@@ -1,6 +1,7 @@
 import subprocess
 import os
 from pathlib import Path
+from flaskr.services.signal_service import signalService
 
 
 class SpellCheckService:
@@ -38,19 +39,28 @@ class SpellCheckService:
             else:
                 return output[:5]
 
+
+
     @staticmethod
     def createDictionaryFromDatabase(sender=None):
         if not SpellCheckService.make_file_unix():
             return
         else:
-            print(os.getcwd())
             dictionary_path = f"{os.getcwd()}/ourDictionary"
-
             temp_path = f"{os.getcwd()}/linuxdict.file"
             aspell_process = f"aspell --lang=pl --encoding=utf-8 create master {dictionary_path} < {temp_path}"
             try:
                 res = subprocess.check_output([aspell_process], shell=True)
+                SpellCheckService.delete_file(temp_path)
+                SpellCheckService.delete_file('dict.txt')
             except subprocess.CalledProcessError as e:
                 return False
-            SpellCheckService.delete_file(temp_path)
-            SpellCheckService.delete_file('dict.txt')
+                #logger
+
+    @staticmethod
+    def checkDictionaryIfExists():
+        if os.path.isfile(str(Path(os.getcwd()).parents[1])+'/ourDictionary'):
+           return True
+        else:
+           return False
+
