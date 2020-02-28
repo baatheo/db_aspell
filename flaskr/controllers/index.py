@@ -40,7 +40,6 @@ def upload():
             fs.setFileContent(content)
             fs.setFileName(file.filename)
             fs.setWords()
-            signalService.get_signal('file_written').connect(SpellCheckService.createDictionaryFromDatabase)
             DictionaryService.create_or_update_dictionary()
             form = {'message': "File uploaded successfully", 'success': True}
             return make_response(jsonify(form=form), 201)
@@ -75,6 +74,11 @@ def verify():
         wordList.append(tempJson)
     form = {'success': "Returned words", 'results': wordList, 'length': len(wordList)}
     return make_response(jsonify(form=form))
+
+
+@bp.route('/verify2', methods=['POST'])
+def ver():
+    return make_response(jsonify(request.form))
 
 
 @bp.route('/<string:name>')
