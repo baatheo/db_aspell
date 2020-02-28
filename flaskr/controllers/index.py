@@ -4,6 +4,7 @@ from flaskr.services.file_to_db_service import FileToDBService
 from flaskr.services.dictionary_service import DictionaryService
 from flaskr.services.signal_service import signalService
 from flask.signals import signals_available
+import os
 
 bp = Blueprint('index', __name__)
 
@@ -55,6 +56,11 @@ def verify():
         errors.append("empty payload")
         form = {'errors': errors}
         return make_response(jsonify(form=form), 422)
+    if not SpellCheckService.checkDictionaryIfExists():
+        errors = []
+        errors.append("Aspell dictionary don't exsist")
+        form = {'errors': errors}
+        return make_response(jsonify(form=form), 503)
 
     #TODO dopracować do końca pobieranie słów i przekazanie do przetwarzania
     wordJson = request.json
