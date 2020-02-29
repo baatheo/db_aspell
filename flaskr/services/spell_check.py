@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import time
 
+
 class SpellCheckService:
 
     @staticmethod
@@ -28,7 +29,8 @@ class SpellCheckService:
         cmd_output = aspell_process.stdout.read().decode("utf-8")
         if cmd_output.find("*") != -1:
             return True
-        elif cmd_output.find("0") != -1:
+        # TODO zrub cos z tym bo sie wytrzymac nie da
+        elif cmd_output.find("# ") != -1:
             return "brak podpowiedzi"
         else:
             output = cmd_output.split(":")[1].split(', ')
@@ -38,7 +40,6 @@ class SpellCheckService:
                 return output[:len(output)]
             else:
                 return output[:5]
-
 
     @staticmethod
     def createDictionaryFromDatabase(sender=None):
@@ -57,8 +58,7 @@ class SpellCheckService:
 
     @staticmethod
     def checkDictionaryIfExists():
-        if os.path.isfile(str(Path(os.getcwd()).parents[1])+'/ourDictionary'):
-           return True
+        if os.path.isfile(str(Path(os.getcwd()).parents[1]) + '/ourDictionary'):
+            return True
         else:
-           return False
-
+            return False

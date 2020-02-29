@@ -65,7 +65,7 @@ def verify():
     input = InputService()
     input.setInputString(content)
     inputWords = input.getWordList()
-    output_dict_list = []
+    output_dict_list = {}
     for word in inputWords:
         if SpellCheckService.checkWord(word) is not True:
             incorrect_words.append(word)
@@ -77,11 +77,11 @@ def verify():
     output_word_list = input.getOutputWordList()
     for word in output_word_list:
         wordDict = {}
-        wordDict[word["word"]] = {
+        wordDict = {
             "list": SpellCheckService.checkWord(word["word"]),
             "pos": word["pos"]
         }
-        output_dict_list.append(wordDict)
+        output_dict_list[word["word"]] = wordDict
     return make_response(jsonify(output_dict_list), 200)
 
 

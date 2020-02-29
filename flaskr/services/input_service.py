@@ -12,14 +12,13 @@ class InputService:
         self.word_list = self.setWordList(self.input_string)
 
     def setOutputWords(self, incorrect_words):
-        self.word_list = []
         self.wordDict_list = []
+        self.output_word_list = []
         self.word_list = incorrect_words
         self.countRepeatingWords()
         self.deleteRepeatinWords()
 
     def getOutputWordList(self):
-        print(self.output_word_list)
         return self.output_word_list
 
     def getWordList(self):
@@ -47,6 +46,7 @@ class InputService:
         for word in self.wordDict_list:
             if word["repeating"] == "not exist":
                 self.output_word_list.append(word)
+
 
     def getIdOfOriginal(self, word, index):
         for x in range(index):
