@@ -34,49 +34,57 @@
         components: {Button},
         data() {
             return {
-                action: "/verify2",
+                action: "/verify",
                 isSending: false,
                 isReady: false,
                 helpText: false,
                 helpTextType: "",
                 formData: new FormData(),
                 textInput:
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "",
                 tempText: [],
                 elements: []
             };
         },
-        mounted() {
-            this.copyText();
-        },
         methods: {
-            copyText: function () {
-                this.tempText = [copyString(this.textInput)];
+            sortMisspells: function(m) {
+                return [...Object.keys(m)].sort((a, b) => {
+                    return a.length < b.length ? 1 : -1;
+                });
             },
             findErrorsInInput: function (misspells) {
-                let t = [' ' + copyString(this.tempText) + ' '];
-                for (const misspell in misspells) {
-                    let temp = [];
-                    let arr = [];
-                    t.forEach(token => {
-                        if ("string" === typeof token) {
-                            temp = token.split(misspell);
-                            arr.push(...temp);
-                        }
-                    });
-                    t = arr;
+                let t = [copyString(this.textInput)];
+                const sortedMisspells = this.sortMisspells(misspells);
+                for (const index in sortedMisspells) {
+                    if (sortedMisspells.hasOwnProperty(index)) {
+                        const misspell = sortedMisspells[index].trim();
+                        let temp = [];
+                        let arr = [];
+                        t.forEach(token => {
+                            if ("string" === typeof token) {
+                                temp = token.split(misspell);
+                                arr.push(...temp);
+                            }
+                        });
+                        t = arr;
+                    }
                 }
                 return t;
             },
-            prepareErrors: function(misspells) {
+            prepareErrors: function (misspells) {
                 let offset = 1;
                 let pp = [];
-                for (let m in misspells) {
-                    if (misspells.hasOwnProperty(m)) {
+                const sortedMisspells = this.sortMisspells(misspells);
+                for (let index in sortedMisspells) {
+                    if (sortedMisspells.hasOwnProperty(index)) {
+                        const m = sortedMisspells[index];
                         let positions = misspells[m]["pos"];
                         let list = misspells[m]["list"];
+                        if ("string" === typeof list) {
+                            list = [list];
+                        }
                         for (let pos in positions) {
-                            pp[positions[pos]] = new ButtonClass({propsData: { text: m, proms: list }});
+                            pp[positions[pos]] = new ButtonClass({propsData: {text: m, proms: list}});
                         }
                     }
                 }
@@ -87,6 +95,7 @@
                 let c = Math.max(text.length, components.length);
                 for (let i = 0; i < c; i++) {
                     let a = text.shift();
+                    a = a.replace(/ /g, '\u00a0');
                     let b = components.shift();
                     if (undefined !== a) {
                         x.push(document.createTextNode(a));
@@ -94,6 +103,7 @@
                     if (undefined !== b) {
                         x.push(b);
                     }
+
                 }
                 return x;
             },
@@ -105,22 +115,8 @@
                 axios
                     .post(this.action, this.formData)
                     .then(resp => {
-                        const list = {
-                            "ipsum": {
-                                "list": ["ipsugum", "ipsumem", "ippsum"],
-                                "pos": [0, 3]
-                            },
-                            "adipiscing": {
-                                "list": ["foo", "foo2"],
-                                "pos": [1, 4]
-                            },
-                            "elit": {
-                                "list": ["bar", "bar2"],
-                                "pos": [2, 5]
-                            },
-                        };
-                        this.elements = this.findErrorsInInput(list);
-                        return list;
+                        this.elements = this.findErrorsInInput(resp.data);
+                        return resp.data;
                     })
                     .then((list) => {
                         return this.concatTextAndErrors(this.elements, this.prepareErrors(list));

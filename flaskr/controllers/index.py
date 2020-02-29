@@ -4,7 +4,7 @@ from flaskr.services.file_to_db_service import FileToDBService
 from flaskr.services.dictionary_service import DictionaryService
 from flaskr.services.signal_service import signalService
 from flask.signals import signals_available
-import os
+from flaskr.services.input_service import InputService
 
 bp = Blueprint('index', __name__)
 
@@ -17,6 +17,12 @@ def index():
 @bp.route('/signals_available')
 def sa():
     return f"{signals_available}"
+
+
+@bp.route('/dict')
+def create_dict():
+    DictionaryService.create_or_update_dictionary()
+    return "Dictionary created"
 
 
 @bp.route('/upload', methods=['POST'])
@@ -51,34 +57,37 @@ def upload():
 
 @bp.route('/verify', methods=['POST', 'GET'])
 def verify():
-    if not request.data:
-        errors = []
-        errors.append("empty payload")
-        form = {'errors': errors}
-        return make_response(jsonify(form=form), 422)
-    if not SpellCheckService.checkDictionaryIfExists():
-        errors = []
-        errors.append("Aspell dictionary don't exsist")
-        form = {'errors': errors}
-        return make_response(jsonify(form=form), 503)
+    # if not request.form:
+    #     errors = []
+    #     errors.append("empty payload")
+    #     form = {'errors': errors}
+    #     return make_response(jsonify(form=form), 422)
 
-    #TODO dopracować do końca pobieranie słów i przekazanie do przetwarzania
-    wordJson = request.json
-    wordList = []
-    for i in wordJson:
-        word = i['word']
-        tempJson = {
-            'word': word,
-            'reply': SpellCheckService.checkWord(word)
+    # rawContent = request.form
+    content = request.form.get('textInput')
+    print("content", content)
+    incorrect_words = []
+    input = InputService()
+    input.setInputString(content)
+    inputWords = input.getWordList()
+    output_dict_list = {}
+    for word in inputWords:
+        if SpellCheckService.checkWord(word) is not True:
+            incorrect_words.append(word)
+        else:
+            print(SpellCheckService.checkWord(word))
+    print("incorrect:", incorrect_words)
+
+    input.setOutputWords(incorrect_words)
+    output_word_list = input.getOutputWordList()
+    for word in output_word_list:
+        wordDict = {}
+        wordDict = {
+            "list": SpellCheckService.checkWord(word["word"]),
+            "pos": word["pos"]
         }
-        wordList.append(tempJson)
-    form = {'success': "Returned words", 'results': wordList, 'length': len(wordList)}
-    return make_response(jsonify(form=form))
-
-
-@bp.route('/verify2', methods=['POST'])
-def ver():
-    return make_response(jsonify(request.form))
+        output_dict_list[word["word"]] = wordDict
+    return make_response(jsonify(output_dict_list), 200)
 
 
 @bp.route('/<string:name>')
