@@ -23,11 +23,13 @@ class SpellCheckService:
 
     @staticmethod
     def checkWord(word):
-        process = f"echo {word} | aspell -a -d ./mnt/c/Projects/db_aspell/ourDictionary"
+        process = f"echo {word} | aspell -a -d /Users/darullef/Documents/Dev/db_aspell/ourDictionary"
         aspell_process = subprocess.Popen(process, shell=True, stdout=subprocess.PIPE)
         cmd_output = aspell_process.stdout.read().decode("utf-8")
         if cmd_output.find("*") != -1:
             return True
+        elif cmd_output.find("0") != -1:
+            return "brak podpowiedzi"
         else:
             output = cmd_output.split(":")[1].split(', ')
             output[0] = output[0].lstrip()
@@ -36,7 +38,6 @@ class SpellCheckService:
                 return output[:len(output)]
             else:
                 return output[:5]
-
 
 
     @staticmethod
