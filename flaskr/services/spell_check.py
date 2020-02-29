@@ -29,7 +29,7 @@ class SpellCheckService:
         SpellCheckService.make_file_unix()
         dictionary_path = f"{os.getcwd()}/{SpellCheckService.dict_file_name}"
         temp_path = f"{os.getcwd()}/linuxdict.file"
-        aspell_process = f"aspell --lang=en --encoding=utf-8 create master {dictionary_path} < {temp_path}"
+        aspell_process = f"aspell --lang=pl --encoding=utf-8 create master {dictionary_path} < {temp_path}"
         try:
             res = subprocess.check_output([aspell_process], shell=True)
             SpellCheckService.delete_file(temp_path)
