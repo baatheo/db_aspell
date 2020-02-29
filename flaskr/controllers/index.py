@@ -19,6 +19,12 @@ def sa():
     return f"{signals_available}"
 
 
+@bp.route('/dict')
+def create_dict():
+    DictionaryService.create_or_update_dictionary()
+    return "Dictionary created"
+
+
 @bp.route('/upload', methods=['POST'])
 def upload():
     file = request.files['file']
@@ -41,7 +47,6 @@ def upload():
             fs.setFileName(file.filename)
             fs.setWords()
             DictionaryService.create_or_update_dictionary()
-            SpellCheckService.createDictionaryFromDatabase()
             form = {'message': "File uploaded successfully", 'success': True}
             return make_response(jsonify(form=form), 201)
     else:
@@ -59,7 +64,7 @@ def verify():
     #     return make_response(jsonify(form=form), 422)
 
     # rawContent = request.form
-    content = request.form['textInput']
+    content = request.form.get('textInput')
     print("content", content)
     incorrect_words = []
     input = InputService()

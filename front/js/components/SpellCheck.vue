@@ -41,36 +41,50 @@
                 helpTextType: "",
                 formData: new FormData(),
                 textInput:
-                    "Lorem ipswum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "",
+                tempText: [],
                 elements: []
             };
         },
         methods: {
-            findErrorsInInput: function (misspells) {
-                let t = [' ' + copyString(this.textInput) + ' '];
-                misspells.forEach((misspell) => {
-                    const w = Object.keys(misspell)[0];
-                    let temp = [];
-                    let arr = [];
-                    t.forEach(token => {
-                        if ("string" === typeof token) {
-                            temp = token.split(w);
-                            arr.push(...temp);
-                        }
-                    });
-                    t = arr;
+            sortMisspells: function(m) {
+                return [...Object.keys(m)].sort((a, b) => {
+                    return a.length < b.length ? 1 : -1;
                 });
+            },
+            findErrorsInInput: function (misspells) {
+                let t = [copyString(this.textInput)];
+                const sortedMisspells = this.sortMisspells(misspells);
+                for (const index in sortedMisspells) {
+                    if (sortedMisspells.hasOwnProperty(index)) {
+                        const misspell = sortedMisspells[index].trim();
+                        let temp = [];
+                        let arr = [];
+                        t.forEach(token => {
+                            if ("string" === typeof token) {
+                                temp = token.split(misspell);
+                                arr.push(...temp);
+                            }
+                        });
+                        t = arr;
+                    }
+                }
                 return t;
             },
-            prepareErrors: function(misspells) {
+            prepareErrors: function (misspells) {
                 let offset = 1;
                 let pp = [];
-                for (let m in misspells) {
-                    if (misspells.hasOwnProperty(m)) {
+                const sortedMisspells = this.sortMisspells(misspells);
+                for (let index in sortedMisspells) {
+                    if (sortedMisspells.hasOwnProperty(index)) {
+                        const m = sortedMisspells[index];
                         let positions = misspells[m]["pos"];
                         let list = misspells[m]["list"];
+                        if ("string" === typeof list) {
+                            list = [list];
+                        }
                         for (let pos in positions) {
-                            pp[positions[pos]] = new ButtonClass({propsData: { text: m, proms: list }});
+                            pp[positions[pos]] = new ButtonClass({propsData: {text: m, proms: list}});
                         }
                     }
                 }
@@ -81,6 +95,7 @@
                 let c = Math.max(text.length, components.length);
                 for (let i = 0; i < c; i++) {
                     let a = text.shift();
+                    a = a.replace(/ /g, '\u00a0');
                     let b = components.shift();
                     if (undefined !== a) {
                         x.push(document.createTextNode(a));
@@ -88,6 +103,7 @@
                     if (undefined !== b) {
                         x.push(b);
                     }
+
                 }
                 return x;
             },
@@ -100,7 +116,6 @@
                     .post(this.action, this.formData)
                     .then(resp => {
                         this.elements = this.findErrorsInInput(resp.data);
-                        console.log(this.elements);
                         return resp.data;
                     })
                     .then((list) => {

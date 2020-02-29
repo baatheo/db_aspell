@@ -6,6 +6,8 @@ import time
 
 class SpellCheckService:
 
+    dict_file_name = "ourDictionary.rws"
+
     @staticmethod
     def delete_file(path):
         if os.path.isfile(path):
@@ -15,24 +17,40 @@ class SpellCheckService:
 
     @staticmethod
     def make_file_unix():
-        proc = "tr -d '\\r' < dict.txt > linuxdict.file "
+        print(os.path.isfile(Path('dict.txt')))
+        script = "tr -d '\\r' < dict.txt > linuxdict.file "
         try:
-            res = subprocess.check_output([proc], shell=True)
-            return True
+            subprocess.call(script, shell=True)
         except subprocess.CalledProcessError as e:
-            return False
+            raise Exception("Can't create linuxdict.file")
+
+    @staticmethod
+    def createDictionaryFromDatabase(sender=None):
+        SpellCheckService.make_file_unix()
+        dictionary_path = f"{os.getcwd()}/{SpellCheckService.dict_file_name}"
+        temp_path = f"{os.getcwd()}/linuxdict.file"
+        aspell_process = f"aspell --lang=en --encoding=utf-8 create master {dictionary_path} < {temp_path}"
+        try:
+            res = subprocess.check_output([aspell_process], shell=True)
+            SpellCheckService.delete_file(temp_path)
+            SpellCheckService.delete_file('dict.txt')
+            return dictionary_path
+        except subprocess.CalledProcessError as e:
+            raise Exception("Can't create ourDictionary.rws")
 
     @staticmethod
     def checkWord(word):
-        process = f"echo {word} | aspell -a -d /mnt/c/Projects/db_aspell/ourDictionary"
+        process = f"echo {word} | aspell -a -d {os.getcwd()}/{SpellCheckService.dict_file_name}"
         aspell_process = subprocess.Popen(process, shell=True, stdout=subprocess.PIPE)
         cmd_output = aspell_process.stdout.read().decode("utf-8")
-        if cmd_output.find("*") != -1:
+        print(cmd_output)
+        if cmd_output.find("*") != -1:  # słowo należy do słownika
             return True
-        # TODO zrub cos z tym bo sie wytrzymac nie da
-        elif cmd_output.find("# ") != -1:
+        elif cmd_output.find("# ") != -1:  # słowo nie należy do słownika i nie ma podpowiedzi dla niego
             return "brak podpowiedzi"
-        else:
+        elif cmd_output == "":  # jakiś błąd
+            raise Exception("Empty cmd_output", cmd_output)
+        else:  # znaleziono propozycje dla słowa
             output = cmd_output.split(":")[1].split(', ')
             output[0] = output[0].lstrip()
             if len(output) < 5:
@@ -40,21 +58,6 @@ class SpellCheckService:
                 return output[:len(output)]
             else:
                 return output[:5]
-
-    @staticmethod
-    def createDictionaryFromDatabase(sender=None):
-        if not SpellCheckService.make_file_unix():
-            return
-        else:
-            dictionary_path = f"{os.getcwd()}/ourDictionary"
-            temp_path = f"{os.getcwd()}/linuxdict.file"
-            aspell_process = f"aspell --lang=pl --encoding=utf-8 create master {dictionary_path} < {temp_path}"
-            try:
-                res = subprocess.check_output([aspell_process], shell=True)
-                SpellCheckService.delete_file(temp_path)
-                SpellCheckService.delete_file('dict.txt')
-            except subprocess.CalledProcessError as e:
-                return False
 
     @staticmethod
     def checkDictionaryIfExists():

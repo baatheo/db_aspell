@@ -31,19 +31,13 @@ class DictionaryService:
         return words_list
 
     @staticmethod
-    def write_txt(words_from_database, path):
-        if os.path.isfile(path):
-            words_list = DictionaryService.get_existing_words(path) + words_from_database
-        else:
-            words_list = words_from_database
-
+    def write_txt(words_list, path):
         words_list.sort()
         file = io.open(path, 'w', encoding='utf8')
 
         for word in words_list:
             file.write(word)
             file.write('\n')
-
         file.close()
         file_written = signalService.get_signal('file_written')
         file_written.send()

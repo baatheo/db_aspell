@@ -1,5 +1,5 @@
 <template>
-    <div ref="word" class="word" @close-toasts="close">
+    <div ref="word" class="word no-size" @close-toasts="close">
         <button class="misspell has-text-danger" v-text="text" @click="open"></button>
         <div ref="balloon" class="balloon box buttons has-addons" v-show="isOpen">
             <button v-for="p in proms" :key="p" class="button" @click="choose">{{ p }}</button>
@@ -33,6 +33,8 @@
             choose: function(event) {
                 this.isOpen = false;
                 this.$refs.word.textContent = event.target.textContent;
+                this.$refs.word.classList.remove('no-size');
+
             }
         }
     }
@@ -43,13 +45,17 @@
         display: inline;
     }
 
+    .word.no-size {
+        font-size: 0;
+    }
+
     button.misspell {
         text-decoration: underline !important;
         background: none;
         margin: 0;
         padding: 0;
         border: none;
-        font-size: 1em;
+        font-size: 1rem;
     }
 
     button.misspell:hover {
@@ -58,6 +64,7 @@
 
     div.box.balloon {
         position: absolute;
+        font-size: 1rem;
     }
     .balloon.buttons .button {
         margin-bottom: 0;
