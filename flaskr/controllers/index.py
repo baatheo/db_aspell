@@ -1,7 +1,10 @@
-from flask import Blueprint, render_template, request, jsonify
-from flaskr.services.spell_check import checkWord
+from flask import Blueprint, render_template, request, jsonify, make_response
+from flaskr.services.spell_check import SpellCheckService
 from flaskr.services.file_to_db_service import FileToDBService
 from flaskr.services.dictionary_service import DictionaryService
+from flaskr.services.signal_service import signalService
+from flask.signals import signals_available
+from flaskr.services.input_service import InputService
 
 bp = Blueprint('index', __name__)
 
@@ -11,43 +14,80 @@ def index():
     return render_template('base.html', action="/upload", w="")
 
 
+@bp.route('/signals_available')
+def sa():
+    return f"{signals_available}"
+
+
+@bp.route('/dict')
+def create_dict():
+    DictionaryService.create_or_update_dictionary()
+    return "Dictionary created"
+
+
 @bp.route('/upload', methods=['POST'])
 def upload():
     file = request.files['file']
     typeOfFile = file.headers['content-type']
-
-    # TODO @baatheo jak będzie inne kodowanie to się wyjebie. Zabezpiecz to jakiś try/catch
-    content = str(file.read().decode('utf-8'))
-
+    errors = []
     if typeOfFile == "text/plain":
+        try:
+            content = str(file.read().decode('utf-8'))
+        except UnicodeDecodeError:
+            errors.append("Cant decode content of file")
+            form = {'errors': errors, 'success': False}
+            return make_response(jsonify(form=form), 422)
         if len(content) == 0:
-            return render_template('base.html', action="/upload", w="pusty plik sprobuj ponownie")
+            errors.append("empty payload")
+            form = {'errors': errors, 'success': False}
+            return make_response(jsonify(form=form), 422)
         else:
             fs = FileToDBService()
             fs.setFileContent(content)
             fs.setFileName(file.filename)
-            fs.saveFromContent()
+            fs.setWords()
             DictionaryService.create_or_update_dictionary()
-            return content
+            form = {'message': "File uploaded successfully", 'success': True}
+            return make_response(jsonify(form=form), 201)
     else:
-        return render_template('base.html', action="/upload", w="zły format pliku sprobuj ponownie")
+        errors.append("Wrong file format")
+        form = {'errors': errors, 'success': False}
+        return make_response(jsonify(form=form), 422)
 
 
 @bp.route('/verify', methods=['POST', 'GET'])
 def verify():
-    if (not request.data):
-        error = "Empty payload"
-        return jsonify(error=error)
+    # if not request.form:
+    #     errors = []
+    #     errors.append("empty payload")
+    #     form = {'errors': errors}
+    #     return make_response(jsonify(form=form), 422)
 
-    wordJson = request.json
-    wordList = []
-    for word in wordJson:
-        tempJson = {
-            'word': word,
-            'reply': checkWord(word)
+    # rawContent = request.form
+    content = request.form.get('textInput')
+    print("content", content)
+    incorrect_words = []
+    input = InputService()
+    input.setInputString(content)
+    inputWords = input.getWordList()
+    output_dict_list = {}
+    for word in inputWords:
+        if SpellCheckService.checkWord(word) is not True:
+            incorrect_words.append(word)
+        else:
+            print(SpellCheckService.checkWord(word))
+    print("incorrect:", incorrect_words)
+
+    input.setOutputWords(incorrect_words)
+    output_word_list = input.getOutputWordList()
+    for word in output_word_list:
+        wordDict = {}
+        wordDict = {
+            "list": SpellCheckService.checkWord(word["word"]),
+            "pos": word["pos"]
         }
-        wordList.append(tempJson)
-    return jsonify(results=wordList, length=len(wordList))
+        output_dict_list[word["word"]] = wordDict
+    return make_response(jsonify(output_dict_list), 200)
 
 
 @bp.route('/<string:name>')
