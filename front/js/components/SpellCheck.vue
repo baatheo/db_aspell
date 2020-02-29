@@ -41,31 +41,25 @@
                 helpTextType: "",
                 formData: new FormData(),
                 textInput:
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                tempText: [],
+                    "Lorem ipswum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 elements: []
             };
         },
-        mounted() {
-            this.copyText();
-        },
         methods: {
-            copyText: function () {
-                this.tempText = [copyString(this.textInput)];
-            },
             findErrorsInInput: function (misspells) {
-                let t = [' ' + copyString(this.tempText) + ' '];
-                for (const misspell in misspells) {
+                let t = [' ' + copyString(this.textInput) + ' '];
+                misspells.forEach((misspell) => {
+                    const w = Object.keys(misspell)[0];
                     let temp = [];
                     let arr = [];
                     t.forEach(token => {
                         if ("string" === typeof token) {
-                            temp = token.split(misspell);
+                            temp = token.split(w);
                             arr.push(...temp);
                         }
                     });
                     t = arr;
-                }
+                });
                 return t;
             },
             prepareErrors: function(misspells) {
@@ -105,9 +99,9 @@
                 axios
                     .post(this.action, this.formData)
                     .then(resp => {
-                        console.log(resp);
-                        this.elements = this.findErrorsInInput(list);
-                        return list;
+                        this.elements = this.findErrorsInInput(resp.data);
+                        console.log(this.elements);
+                        return resp.data;
                     })
                     .then((list) => {
                         return this.concatTextAndErrors(this.elements, this.prepareErrors(list));

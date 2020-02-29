@@ -2785,37 +2785,25 @@ var ButtonClass = Vue.extend(_Button__WEBPACK_IMPORTED_MODULE_0__["default"]);
       helpText: false,
       helpTextType: "",
       formData: new FormData(),
-      textInput: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      tempText: [],
+      textInput: "Lorem ipswum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       elements: []
     };
   },
-  mounted: function mounted() {
-    this.copyText();
-  },
   methods: {
-    copyText: function copyText() {
-      this.tempText = [copyString(this.textInput)];
-    },
     findErrorsInInput: function findErrorsInInput(misspells) {
-      var t = [' ' + copyString(this.tempText) + ' '];
-
-      var _loop = function _loop(misspell) {
+      var t = [' ' + copyString(this.textInput) + ' '];
+      misspells.forEach(function (misspell) {
+        var w = Object.keys(misspell)[0];
         var temp = [];
         var arr = [];
         t.forEach(function (token) {
           if ("string" === typeof token) {
-            temp = token.split(misspell);
+            temp = token.split(w);
             arr.push.apply(arr, _toConsumableArray(temp));
           }
         });
         t = arr;
-      };
-
-      for (var misspell in misspells) {
-        _loop(misspell);
-      }
-
+      });
       return t;
     },
     prepareErrors: function prepareErrors(misspells) {
@@ -2825,13 +2813,13 @@ var ButtonClass = Vue.extend(_Button__WEBPACK_IMPORTED_MODULE_0__["default"]);
       for (var m in misspells) {
         if (misspells.hasOwnProperty(m)) {
           var positions = misspells[m]["pos"];
-          var _list = misspells[m]["list"];
+          var list = misspells[m]["list"];
 
           for (var pos in positions) {
             pp[positions[pos]] = new ButtonClass({
               propsData: {
                 text: m,
-                proms: _list
+                proms: list
               }
             });
           }
@@ -2867,9 +2855,9 @@ var ButtonClass = Vue.extend(_Button__WEBPACK_IMPORTED_MODULE_0__["default"]);
       this.formData = new FormData(event.target);
       this.$refs.result.textContent = "";
       axios.post(this.action, this.formData).then(function (resp) {
-        console.log(resp);
-        _this.elements = _this.findErrorsInInput(list);
-        return list;
+        _this.elements = _this.findErrorsInInput(resp.data);
+        console.log(_this.elements);
+        return resp.data;
       }).then(function (list) {
         return _this.concatTextAndErrors(_this.elements, _this.prepareErrors(list));
       }).then(function (nodes) {
