@@ -2,16 +2,17 @@ import re
 
 
 class InputService:
-    input_String = ""
+    input_string = ""
     word_list = []
     output_word_list = []
     wordDict_list = []
 
-    def setInputString(self, input):
-        self.input_String = input
-        self.setWordList()
+    def setInputString(self, input_text):
+        self.input_string = input_text
+        self.word_list = self.setWordList(self.input_string)
 
-    def setOutputWords(self):
+    def setOutputWords(self, incorrect_words):
+        self.word_list = incorrect_words
         self.countRepeatingWords()
         self.deleteRepeatinWords()
 
@@ -21,8 +22,9 @@ class InputService:
     def getWordList(self):
         return self.word_list
 
-    def setWordList(self):
-        self.word_list = re.sub(r'[^a-ząćęłńóśźżĄĆĘŁŃÓŚŹŻA-Z0-9\n ]', r'', self.input_String).split()
+    @staticmethod
+    def setWordList(input_string):
+        return re.sub(r'[^a-ząćęłńóśźżĄĆĘŁŃÓŚŹŻA-Z0-9\n ]', r'', input_string).split()
 
     def countRepeatingWords(self):
         for x in range(len(self.word_list)):

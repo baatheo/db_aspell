@@ -52,25 +52,27 @@ def upload():
 
 @bp.route('/verify', methods=['POST', 'GET'])
 def verify():
-    if not request.form:
-        errors = []
-        errors.append("empty payload")
-        form = {'errors': errors}
-        return make_response(jsonify(form=form), 422)
+    # if not request.form:
+    #     errors = []
+    #     errors.append("empty payload")
+    #     form = {'errors': errors}
+    #     return make_response(jsonify(form=form), 422)
 
-    rawContent = request.form
-    content = rawContent.get('textInput')
+    # rawContent = request.form
+    content = request.form['textInput']
+    print(content)
     incorrect_words = []
     input = InputService()
     input.setInputString(content)
     inputWords = input.getWordList()
     output_dict_list = []
     for word in inputWords:
-       if SpellCheckService.checkWord(word) is not True:
-           incorrect_words.append(word)
+        if SpellCheckService.checkWord(word) is not True:
+            incorrect_words.append(word)
+        else:
+            print(SpellCheckService.checkWord(word))
 
-    input.setInputString(incorrect_words)
-    input.setOutputWords()
+    input.setOutputWords(incorrect_words)
     output_word_list = input.getOutputWordList()
     for word in output_word_list:
         wordDict = {}
