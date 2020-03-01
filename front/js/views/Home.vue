@@ -1,8 +1,5 @@
 <template>
-    <div>
-        <h2 class="title">db_aspell</h2>
         <SpellCheck />
-    </div>
 </template>
 
 <script>

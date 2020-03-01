@@ -2,7 +2,7 @@
     <div ref="word" class="word no-size" @close-toasts="close">
         <button class="misspell has-text-danger" v-text="text" @click="open"></button>
         <div ref="balloon" class="balloon box buttons has-addons" v-show="isOpen">
-            <button v-for="p in proms" :key="p" class="button" @click="choose">{{ p }}</button>
+            <button v-for="p in proms" :key="p" class="button" @click="choose" :disabled="disabled">{{ p }}</button>
         </div>
     </div>
 </template>
@@ -12,7 +12,7 @@
 
     export default {
         name: "Button",
-        props: [ 'text', 'proms' ],
+        props: [ 'text', 'proms', 'disabled' ],
         data() {
             return {
                 isOpen: false

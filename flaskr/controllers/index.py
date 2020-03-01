@@ -11,18 +11,7 @@ bp = Blueprint('index', __name__)
 
 @bp.route('/')
 def index():
-    return render_template('base.html', action="/upload", w="")
-
-
-@bp.route('/signals_available')
-def sa():
-    return f"{signals_available}"
-
-
-@bp.route('/dict')
-def create_dict():
-    DictionaryService.create_or_update_dictionary()
-    return "Dictionary created"
+    return render_template('base.html', title="GNU Aspell based, online spell checker")
 
 
 @bp.route('/upload', methods=['POST'])
@@ -88,8 +77,3 @@ def verify():
         }
         output_dict_list[word["word"]] = wordDict
     return make_response(jsonify(output_dict_list), 200)
-
-
-@bp.route('/<string:name>')
-def hello(name):
-    return f"Hello, {name.capitalize()}"

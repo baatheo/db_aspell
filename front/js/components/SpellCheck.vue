@@ -58,11 +58,12 @@
                 for (const index in sortedMisspells) {
                     if (sortedMisspells.hasOwnProperty(index)) {
                         const misspell = sortedMisspells[index].trim();
+                        const re = new RegExp('\\b' + misspell + '\\b');
                         let temp = [];
                         let arr = [];
                         t.forEach(token => {
                             if ("string" === typeof token) {
-                                temp = token.split(misspell);
+                                temp = token.split(re);
                                 arr.push(...temp);
                             }
                         });
@@ -77,14 +78,16 @@
                 const sortedMisspells = this.sortMisspells(misspells);
                 for (let index in sortedMisspells) {
                     if (sortedMisspells.hasOwnProperty(index)) {
-                        const m = sortedMisspells[index];
-                        let positions = misspells[m]["pos"];
-                        let list = misspells[m]["list"];
-                        if ("string" === typeof list) {
-                            list = [list];
+                        const text = sortedMisspells[index];
+                        let positions = misspells[text]["pos"];
+                        let proms = misspells[text]["list"];
+                        let disabled = false;
+                        if ("string" === typeof proms && "brak podpowiedzi" === proms) {
+                            proms = [proms];
+                            disabled = true;
                         }
                         for (let pos in positions) {
-                            pp[positions[pos]] = new ButtonClass({propsData: {text: m, proms: list}});
+                            pp[positions[pos]] = new ButtonClass({propsData: {text, proms, disabled}});
                         }
                     }
                 }

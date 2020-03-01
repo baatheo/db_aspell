@@ -68,7 +68,13 @@
                         })
                         .catch((error) => {
                             this.helpTextType = "is-danger";
-                            this.helpText = error.response.data.form.errors.join('\n');
+                            try {
+                                this.helpText = error.response.data.form.errors.join('\n');
+                            }
+                            catch (e) {
+                                this.helpText = "Internal server error"
+                                console.error(error.response)
+                            }
                         })
                         .finally(() => {
                             this.isSending = false;
