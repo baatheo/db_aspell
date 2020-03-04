@@ -13,11 +13,10 @@ class SpellCheckService:
         if os.path.isfile(path):
             os.unlink(path)
         else:
-            print("Can't delete file that doesn't exists.")
+            print("Can't delete file that doesn't exists.", path)
 
     @staticmethod
     def make_file_unix():
-        print(os.path.isfile(Path('dict.txt')))
         script = "tr -d '\\r' < dict.txt > linuxdict.file "
         try:
             subprocess.call(script, shell=True)
@@ -43,7 +42,6 @@ class SpellCheckService:
         process = f"echo {word} | aspell -a -d {os.getcwd()}/{SpellCheckService.dict_file_name}"
         aspell_process = subprocess.Popen(process, shell=True, stdout=subprocess.PIPE)
         cmd_output = aspell_process.stdout.read().decode("utf-8")
-        print(cmd_output)
         if cmd_output.find("*") != -1:  # słowo należy do słownika
             return True
         elif cmd_output.find("# ") != -1:  # słowo nie należy do słownika i nie ma podpowiedzi dla niego
