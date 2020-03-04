@@ -54,7 +54,6 @@ def verify():
 
     # rawContent = request.form
     content = request.form.get('textInput')
-    print("content", content)
     incorrect_words = []
     input = InputService()
     input.setInputString(content)
@@ -63,9 +62,6 @@ def verify():
     for word in inputWords:
         if SpellCheckService.checkWord(word) is not True:
             incorrect_words.append(word)
-        else:
-            print(SpellCheckService.checkWord(word))
-    print("incorrect:", incorrect_words)
 
     input.setOutputWords(incorrect_words)
     output_word_list = input.getOutputWordList()
